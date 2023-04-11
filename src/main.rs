@@ -6,6 +6,11 @@ use std::io::stdin;
 
 type PuzzleNumber = i16;
 
+struct Puzzle {
+    numbers: BTreeSet<PuzzleNumber>,
+    solution: PuzzleNumber,
+}
+
 fn input_number() -> Result<PuzzleNumber, &'static str> {
     // read input
     let mut line = String::new();
@@ -40,7 +45,7 @@ fn input_pool() -> BTreeSet<PuzzleNumber> {
                 set.insert(n);
             },
             Err(e) => {
-                println!("Error: {}. Try again.", e);
+                println!("Error: {e}. Try again.");
             }
         }
     }
@@ -48,7 +53,26 @@ fn input_pool() -> BTreeSet<PuzzleNumber> {
     set
 }
 
+fn input_puzzle() -> Puzzle {
+    // input solution
+    println!("Enter solution: ");
+    let mut sol = input_number();
+    while let Err(e) = sol {
+        println!("Error: {e}. Try again");
+    }
+    let solution = sol.unwrap();
+    
+    // input pool of numbers
+    let pool = input_pool();
+
+    // create struct and return
+    println!("Puzzle created: {pool:?} => {solution}");
+    Puzzle {
+        numbers: pool,
+        solution
+    }
+}
+
 fn main() {
-    let set = input_pool();
-    println!("set: {set:?}");
+    input_puzzle();
 }
