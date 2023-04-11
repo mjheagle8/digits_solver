@@ -4,7 +4,9 @@
 use std::collections::BTreeSet;
 use std::io::stdin;
 
-fn input_number() -> Result<i16, &'static str> {
+type PuzzleNumber = i16;
+
+fn input_number() -> Result<PuzzleNumber, &'static str> {
     // read input
     let mut line = String::new();
     let r = stdin().read_line(&mut line);
@@ -15,7 +17,7 @@ fn input_number() -> Result<i16, &'static str> {
     }
 
     // check that number was provided and return it
-    let num = line.trim().parse::<i16>();
+    let num = line.trim().parse::<PuzzleNumber>();
     if let Ok(n) = num {
         if n > 0 {
             return Ok(n);
@@ -27,7 +29,7 @@ fn input_number() -> Result<i16, &'static str> {
     }
 }
 
-fn input_pool() -> BTreeSet<i16> {
+fn input_pool() -> BTreeSet<PuzzleNumber> {
     let mut set = BTreeSet::new();
     println!("Enter numbers in pool: ");
 
