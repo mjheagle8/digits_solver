@@ -1,18 +1,30 @@
 // NYT Digits solver
 // By: mjheagle
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, VecDeque};
 use std::fmt;
 use std::io::stdin;
 
 type PuzzleNumber = i16;
 
+/// Operations possible
+#[derive(Eq, PartialEq, Clone, Debug)]
+enum Operations {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+}
+
 /// Digits puzzle object
+#[derive(Clone)]
 struct Puzzle {
     /// Pool of numbers used to create the target solution
     numbers: BTreeSet<PuzzleNumber>,
     /// Target solution
     solution: PuzzleNumber,
+    /// History of equations used to get to the current puzzle state
+    history: Vec<PuzzleEquation>,
 }
 /// Define how to display puzzle object
 impl fmt::Display for Puzzle {
@@ -29,8 +41,100 @@ impl Puzzle {
     /// * `nums` - an array of 6 numbers used to create the solution
     pub fn new(solution: PuzzleNumber, nums: &[PuzzleNumber; 6]) -> Self {
         let numbers = BTreeSet::from(*nums);
-        Puzzle { numbers, solution }
+        let history = vec![];
+        Puzzle {
+            numbers,
+            solution,
+            history,
+        }
     }
+
+    /// Solve a Puzzle
+    pub fn solve(&self) -> Option<Puzzle> {
+        // initialize queue with base puzzle
+        let mut queue = VecDeque::new();
+        let copy = self.clone();
+        queue.push_back(copy);
+        let solution = self.solution;
+
+        // calculate permutations of each item, adding new permutations to queue
+        while let Some(p) = queue.pop_front() {
+            // check if solution is in pool of numbers
+            if p.numbers.contains(&solution) {
+                println!("Solution found -> {p}");
+                for history in &p.history {
+                    println!("    {history:?}");
+                }
+                return Some(p);
+            }
+            // get pool of numbers
+            let nums = p.numbers.len();
+            // iterate through every pair of numbers
+            for (index, &n0) in p.numbers.iter().enumerate() {
+                for &n1 in p.numbers.iter().skip(index + 1) {
+                    // create new pool, removing numbers to combine
+                    let mut new_pool = p.numbers.clone();
+                    new_pool.remove(&n1);
+                    new_pool.remove(&n0);
+                    // combine numbers with all types of Operations
+                    let ops = [
+                        Operations::Add,
+                        Operations::Subtract,
+                        Operations::Multiply,
+                        Operations::Divide,
+                    ];
+                    for operation in ops {
+                        // check numbers are divisible if division was performed
+                        if operation == Operations::Divide && n1 % n0 != 0 {
+                            continue;
+                        }
+                        // perform operation
+                        let result = match operation {
+                            Operations::Add => n1 + n0,
+                            Operations::Subtract => n1 - n0,
+                            Operations::Multiply => n1 * n0,
+                            Operations::Divide => n1 / n0,
+                        };
+                        // add new number to pool
+                        let mut numbers = new_pool.clone();
+                        numbers.insert(result);
+                        // create and append new history for this combination
+                        let new_history = PuzzleEquation {
+                            n0,
+                            n1,
+                            operation,
+                            result,
+                        };
+                        let mut history = p.history.clone();
+                        history.push(new_history);
+                        // create new Puzzle object
+                        let new_puzzle = Puzzle {
+                            numbers,
+                            solution,
+                            history,
+                        };
+                        // add new Puzzle to queue
+                        queue.push_back(new_puzzle);
+                    }
+                }
+            }
+        }
+        // no solution found
+        None
+    }
+}
+
+/// Equation involving two numbers
+#[derive(Clone, Debug)]
+struct PuzzleEquation {
+    /// First number in equation
+    n0: PuzzleNumber,
+    /// Second number in equation
+    n1: PuzzleNumber,
+    /// How the two numbers will be combined
+    operation: Operations,
+    /// Result of the equation
+    result: PuzzleNumber,
 }
 
 fn input_number() -> Result<PuzzleNumber, &'static str> {
@@ -96,5 +200,6 @@ fn input_puzzle() -> Puzzle {
 }
 
 fn main() {
-    input_puzzle();
+    let p = input_puzzle();
+    p.solve();
 }
