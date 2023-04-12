@@ -5,7 +5,7 @@ use std::collections::{BTreeSet, VecDeque};
 use std::fmt;
 use std::io::stdin;
 
-type PuzzleNumber = i16;
+type PuzzleNumber = u32;
 
 /// Operations possible
 #[derive(Eq, PartialEq, Clone, Debug)]
@@ -219,4 +219,28 @@ fn input_puzzle() -> Puzzle {
 fn main() {
     let p = input_puzzle();
     p.solve();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn find_solutions() {
+        let p = Puzzle::new(66, &[1, 3, 5, 10, 4, 25]).solve();
+        assert!(p.is_some());
+        println!("{}", p.unwrap());
+        let p = Puzzle::new(126, &[2, 10, 3, 15, 9, 25]).solve();
+        assert!(p.is_some());
+        println!("{}", p.unwrap());
+        let p = Puzzle::new(234, &[3, 8, 4, 9, 6, 11]).solve();
+        assert!(p.is_some());
+        println!("{}", p.unwrap());
+        let p = Puzzle::new(335, &[5, 11, 6, 15, 8, 20]).solve();
+        assert!(p.is_some());
+        println!("{}", p.unwrap());
+        let p = Puzzle::new(476, &[5, 19, 7, 20, 11, 23]).solve();
+        assert!(p.is_some());
+        println!("{}", p.unwrap());
+    }
 }
