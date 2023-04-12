@@ -73,8 +73,6 @@ impl Puzzle {
                 }
                 return Some(p);
             }
-            // get pool of numbers
-            let nums = p.numbers.len();
             // iterate through every pair of numbers
             for (index, &n0) in p.numbers.iter().enumerate() {
                 for &n1 in p.numbers.iter().skip(index + 1) {
@@ -201,7 +199,7 @@ fn input_pool() -> [PuzzleNumber; 6] {
 fn input_puzzle() -> Puzzle {
     // input solution
     println!("Enter solution: ");
-    let mut sol = input_number();
+    let sol = input_number();
     while let Err(e) = sol {
         println!("Error: {e}. Try again");
     }
