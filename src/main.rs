@@ -29,7 +29,13 @@ struct Puzzle {
 /// Define how to display puzzle object
 impl fmt::Display for Puzzle {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Puzzle: {:?} => {}", self.numbers, self.solution)
+        write!(f, "Puzzle: {:?} => {}", self.numbers, self.solution)?;
+        write!(f, "  [")?;
+        for h in &self.history {
+            write!(f, "{h};")?;
+        }
+        write!(f, "]")?;
+        Ok(())
     }
 }
 impl Puzzle {
@@ -63,7 +69,7 @@ impl Puzzle {
             if p.numbers.contains(&solution) {
                 println!("Solution found -> {p}");
                 for history in &p.history {
-                    println!("    {history:?}");
+                    println!("    {history}");
                 }
                 return Some(p);
             }
@@ -135,6 +141,17 @@ struct PuzzleEquation {
     operation: Operations,
     /// Result of the equation
     result: PuzzleNumber,
+}
+impl fmt::Display for PuzzleEquation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let op = match self.operation {
+            Operations::Add         => "+",
+            Operations::Subtract    => "-",
+            Operations::Multiply    => "*",
+            Operations::Divide      => "/",
+        };
+        write!(f, "{} {op} {} = {}", self.n1, self.n0, self.result)
+    }
 }
 
 fn input_number() -> Result<PuzzleNumber, &'static str> {
